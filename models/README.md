@@ -1,0 +1,1 @@
+Go to Workspace -> Models -> Import JSON(right top corner drop down next to Create button), select [log-chatbot.json](https://github.com/MrMakkarone/log-chatbot/tree/main/models/log-chatbot.json).

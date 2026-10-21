@@ -1,1 +1,2 @@
-These are the scripts that run in the backend when a tool was called, which then starts a subprocess.
+These are the scripts that run in the backend when a tool was called, which then starts a subprocess. 
+The scripts live in the open-webui docker container (see [docker-compose.yml](https://github.com/MrMakkarone/log-chatbot/blob/main/docker-compose.yml)).

@@ -1,14 +1,14 @@
 ## Start up Open WebUI and elasticsearch instances
 
 ```python
-docker compose up
+docker compose up -d
 ```
 
 ## Add tools
-[README.md](https://github.com/MrMakkarone/log-chatbot/tools/README.md)
+[README.md](https://github.com/MrMakkarone/log-chatbot/tree/main/tools/README.md)
 
 ## Add models
-[README.md](https://github.com/MrMakkarone/log-chatbot/models/README.md)
+[README.md](https://github.com/MrMakkarone/log-chatbot/tree/main/models/README.md)
 
 ## Set up OpenRouter
 [OpenRouter API key](https://openrouter.ai/workspaces/default/keys)
