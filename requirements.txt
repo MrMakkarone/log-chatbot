@@ -1,0 +1,5 @@
+pathlib
+typing
+pydantic
+elasticsearch==8.15.0
+argparse

@@ -1,0 +1,116 @@
+services:
+  open-webui:
+    build: .
+    container_name: open-webui
+    ports:
+      - "3000:8080"  # Web interface (http://localhost:3000)
+    environment:
+      #can change these settings in the Open WebUI Admin Panel
+      - OLLAMA_BASE_URL=http://localhost:11434
+      - WEBUI_AUTH=False  # Disable authentication for simplicity (enable if needed)
+      - WEBUI_SECRET_KEY=temporary-secret-key-change-me  # Change this!
+      - ENABLE_SIGNUP=true
+      - DEFAULT_USER_ROLE=admin
+      - RAG_EMBEDDING_ENGINE=ollama  # Use Ollama for embeddings
+      - RAG_EMBEDDING_MODEL=nomic-embed-text:latest
+      - RAG_TOP_K=15  # Number of relevant chunks to retrieve
+      - RAG_RELEVANCE_THRESHOLD=0.3  # Include all retrieved chunks
+      - CONTENT_EXTRACTION_ENGINE=tika  # PDF/document parsing
+
+      - GLOBAL_LOG_LEVEL=DEBUG
+
+    volumes:
+      - open-webui_data:/app/backend/data  # Chat history and document metadata
+      - ./custom_scripts:/app/custom_scripts
+    restart: unless-stopped
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # For Tika connectivity if needed
+
+  # Apache Tika - Content extraction service for better document parsing
+  #Can be uncommented if further developed. Only type support .csv at first
+  #tika:
+  #  image: apache/tika:latest-full
+  #  container_name: tika
+  #  ports:
+  #    - "9998:9998"  # Content extraction API
+  #  restart: unless-stopped
+
+# This prototype uses OpenRouter instead of ollama
+#  ollama:
+#    image: ollama/ollama
+#    container_name: ollama
+#    ports:
+#      - "11434:11434"
+#    volumes:
+#    - ollama_data:/root/.ollama
+#    restart: unless-stopped
+#    deploy:
+#      resources:
+#        limits:
+#          cpus: '6'
+#          memory: 25g
+#        reservations:
+#          devices:
+#            - driver: nvidia
+#              count: 1
+#              capabilities: [ gpu ]
+#    environment:
+#      - NVIDIA_VISIBLE_DEVICES=all
+#      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+#      - NVIDIA_VISIBLE_DEVICES=all
+#      - NVIDIA_GPU_MEMORY_LIMIT=6144mb
+#      - OLLAMA_KEEP_ALIVE=5m
+#
+#  ollama:
+#    image: ollama/ollama
+#    container_name: ollama
+#    ports:
+#      - "11434:11434"
+#    volumes:
+#      - ollama_data:/root/.ollama
+#    restart: unless-stopped
+#
+#    # Direct CPU & RAM limits (v2, works without Swarm)
+#    cpus: '6'          # 12 cores (or a fraction like '3.5')
+#    mem_limit: 25g      # 25 GB
+#
+#    # Essential for GPU access
+#    runtime: nvidia
+#
+#    environment:
+#      - NVIDIA_VISIBLE_DEVICES=all
+#      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+#      - NVIDIA_GPU_MEMORY_LIMIT=6144mb   # Hard GPU memory cap
+#      - OLLAMA_KEEP_ALIVE=5m
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.15.0
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.15.0
+    container_name: kibana
+    depends_on:
+      - elasticsearch
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+
+
+volumes:
+  #ollama_data:
+    #name: ollama_data
+  open-webui_data:
+    name: open-webui_data
+  es_data:
+    name: es_data
+
