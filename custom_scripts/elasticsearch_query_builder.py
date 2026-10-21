@@ -79,9 +79,28 @@ def _build_query(llm_query_dict: dict):
 
             else:
                 if isinstance(value, str):
-                    result["bool"]["must"].append({"wildcard": {key: value}})
-                    #TODO make wildcards injection free
+                    result["bool"]["must"].append({"wildcard": {_escape_value(key): _escape_value(value)}})
+                    #TODO ensure wildcards are injection free - the keys should be bound to an allowlist, but for this prototype its fine
                 else:
                     raise TypeError(f"Expected a str but found {type(value)}")
 
     return result
+
+def _escape_value(input) -> str:
+    raw_val = str(input)
+
+    # 1. Check for leading/trailing wildcards
+    has_leading_star = raw_val.startswith("*")
+    has_trailing_star = raw_val.endswith("*")
+    # 2. Strip boundary wildcards for escaping
+    core_val = raw_val.strip("*")
+    # 3. Escape dangerous internal characters
+    escaped_core = core_val.replace("\\", "\\\\").replace("*", "\\*").replace("?", "\\?")
+    # 4. Truncate string if too long
+    escaped_core = escaped_core[:100]
+    # 5. Reconstruct value
+    prefix = "*" if has_leading_star else ""
+    suffix = "*" if has_trailing_star else ""
+    escaped_value = f"{prefix}{escaped_core}{suffix}"
+
+    return escaped_value
