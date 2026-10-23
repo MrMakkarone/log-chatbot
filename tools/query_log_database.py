@@ -1,10 +1,97 @@
+"""### DSL Output Specification
+
+Output a single JSON object matching the `llm_query_dict` schema defined below. Do not include markdown or wrapping unless requested.
+
+---
+
+### JSON Schema Rules
+
+#### 1. `timestamp` (Optional)
+
+* **Type:** Object
+* **Keys:** Allowed keys are strictly `"gt"`, `"gte"`, `"lt"`, `"lte"`.
+* **Value:** ISO date/datetime string (e.g., `"YYYY-MM-DD"` or `"YYYY-MM-DDTHH:MM:SS"`).
+* **Correct Format:**
+```json
+"timestamp": {
+  "gte": "2026-01-01",
+  "lt": "2026-02-01"
+}
+
+```
+
+
+* **Invalid:** `{"value": "2026-01-01", "operator": "gte"}` will throw a `ValueError`.
+
+#### 2. `severity` (Optional)
+
+* **Type:** Array of Strings
+* **Allowed Values:** `"INFO"`, `"WARN"`, `"ERROR"` (Case-insensitive; normalized to uppercase).
+* **Correct Format:**
+```json
+"severity": ["WARN", "ERROR"]
+
+```
+
+
+
+#### 3. Any Other Field Name (Optional)
+
+* **Field Names:** Standard log fields such as `"log_type"`, `"component"`, `"event"`, `"message"`, etc.
+* **Type:** String
+* **Behavior:** Treated as a wildcard match pattern. Use leading/trailing `*` for substring matching.
+* **Correct Format:**
+```json
+"component": "auth_service",
+"message": "*timeout*"
+
+```
+
+
+
+---
+
+### Example JSON Outputs
+
+#### Example 1: Full Query
+
+```json
+{
+  "timestamp": {
+    "gte": "2026-10-01",
+    "lte": "2026-10-23"
+  },
+  "severity": ["WARN", "ERROR"],
+  "component": "payment-api",
+  "message": "*failed*"
+}
+
+```
+
+#### Example 2: Date Range & Text Match
+
+```json
+{
+  "timestamp": {
+    "gt": "2026-01-01"
+  },
+  "event": "user_login"
+}
+
+```
+
+#### Example 3: Match All (Empty Query)
+
+```json
+{}
+
+```
+"""
+
 import subprocess
 import json
 from typing import List, Optional
 import ast
-
-import requests
-
 
 
 class Tools:
@@ -46,7 +133,6 @@ class Tools:
                 "Expected to found a list of database entries, but found non. Is there no data/orders for the specified parameters?"
             )
 
-
         result = f"Found {len(retrieved_data)} entries. "
 
         # Check if retrieved data exceeds 20k token context
@@ -56,6 +142,5 @@ class Tools:
             result += str(retrieved_data)[:72_000]  # ~18k tokens, with some safety margin
         else:
             result += str(retrieved_data)
-
 
         return result
