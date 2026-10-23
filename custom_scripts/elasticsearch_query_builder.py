@@ -26,7 +26,7 @@ possible llm_query_dict - dsl examples
         { "wildcard": { "message": { "value": "*x*", "case_insensitive": true } } }
       ],
       "filter": [
-        { "terms": { "severity": ["warn", "error"] } },
+        { "terms": { "severity": ["WARN", "ERROR"] } },
         { "range": { "timestamp": { "lte": "2015-01-10" } } }
       ]
     }

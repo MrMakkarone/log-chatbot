@@ -101,8 +101,6 @@ class Tools:
         self.file_handler = True
         self.citation = True
 
-
-
     async def _query_relevant_data(self, query: str) -> str:
         """
         :params: query:str: The DSL conform query in a JSON VALID format
@@ -113,10 +111,6 @@ class Tools:
             raise ValueError(
                 "Please provide a query",
             )
-        try:
-            json.loads(query)
-        except (json.JSONDecodeError, TypeError):
-            raise ValueError("The provided query is not valid JSON.")
 
         # each prompt store files and flush database afterwards. Keep it simple for prototype
         await self._store_log_files()
@@ -143,7 +137,7 @@ class Tools:
             raise ValueError("No data found for the specified parameters.")
         if not isinstance(retrieved_data, list):
             raise ValueError(
-                "Expected to found a list of database entries, but found non. Is there no data/orders for the specified parameters?"
+                "Expected to found a list of database entries, but found non."
             )
 
         result = f"Found {len(retrieved_data)} entries. "
