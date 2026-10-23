@@ -98,9 +98,12 @@ class Tools:
 
     def __init__(self):
         # self.valves = self.Valves()
-        pass
+        self.file_handler = True
+        self.citation = True
 
-    async def query_relevant_data(self, query: str) -> str:
+
+
+    async def _query_relevant_data(self, query: str) -> str:
         """
         :params: query:str: The DSL conform query in a JSON VALID format
         :return: Data is displayed in chat UI. Please inform the user if the data retrieval was successful, and whether the data was displayed successfully.
@@ -110,16 +113,26 @@ class Tools:
             raise ValueError(
                 "Please provide a query",
             )
+        try:
+            json.loads(query)
+        except (json.JSONDecodeError, TypeError):
+            raise ValueError("The provided query is not valid JSON.")
+
+        # each prompt store files and flush database afterwards. Keep it simple for prototype
+        await self._store_log_files()
 
         subprocess_output = subprocess.run(
             [
                 "python",
                 "/app/custom_scripts/query_log_database.py",
-                json.dumps(query),
+                query,#already valid JSON
             ],
             capture_output=True,
             text=True,
         )
+
+        # each prompt files are stored and database is cleared afterwards. Keep it simple for prototype
+        await self._clear_database()
 
         if subprocess_output.returncode != 0:
             return None, f"Script error:\n{subprocess_output.stderr}"
@@ -144,3 +157,41 @@ class Tools:
             result += str(retrieved_data)
 
         return result
+
+    async def _store_log_files(
+        self,
+        __files__: List[dict] = [],
+    ) -> str:
+        """
+        __files__ is open webui's internal files parameter - all files in the current chat
+        """
+
+        # .csv check missing. But fine for prototype.
+        if not __files__:
+            return "No log file uploaded yet. .csv expected - found none. Required to answer any questions about logs."
+        file_paths = []
+        for file in __files__:
+            file_paths.append(file.get("file", {}).get("path"))
+        file_paths = json.dumps(file_paths)
+        result = subprocess.run(
+            [
+                "python",
+                "/app/custom_scripts/store_log_files.py",
+                file_paths,
+            ],
+            capture_output=True,
+            text=True,
+        )
+
+        if result.returncode != 0:
+            return f"Script error:\n{result.stderr}"
+
+        return f"{result.stdout}"
+
+    async def _clear_database(self):
+        subprocess.run(
+            [
+                "python",
+                "/app/custom_scripts/flush_database.py",
+            ],
+        )
