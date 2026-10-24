@@ -9,9 +9,17 @@ It should also aid as an explorative insight how chatbots can help and accelerat
 Therefore, I set as a goal that the chatbot should be able to answer questions like: "Please tell me whether there was a problem with the printing for a.jones roughly around 8 o clock at the 20th of October and whether it got resolved."
 
 ## Result - Example Chat Conversations
+
+### Example 1
 ![Example chat conversation 1](https://raw.githubusercontent.com/MrMakkarone/log-chatbot/main/example_conversations/example-1.png)
+
+### Example 1 - Tool Calls
 ![Example chat tool calls 1](https://raw.githubusercontent.com/MrMakkarone/log-chatbot/main/example_conversations/example-1-tool-calls.png)
+
+### Example 2
 ![Example chat conversation 2](https://raw.githubusercontent.com/MrMakkarone/log-chatbot/main/example_conversations/example-2.png)
+
+### Example 2 - Tool Calls
 ![Example chat tool calls 2](https://raw.githubusercontent.com/MrMakkarone/log-chatbot/main/example_conversations/example-2-tool-calls.png)
 
 ## Local deployment
