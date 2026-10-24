@@ -3,8 +3,8 @@
 ## Context
 
 I created this log chatbot project to show that I can build a plain chatbot prototype in a week based on my knowledge gained in the previous years.
-This project is not vibe coded and aims as a conversation foundation to talk about design choices and challenges when creating a chatbot.  
-It should also aid as an explorative insight how chatbots can help and accelerate reading log files and understand problems in their software and hardware, such as printers.
+This project is not vibe coded and is intended as a basis for a discussion about design choices and challenges when developing a chatbot.  
+It should also aid as an explorative insight how chatbots can help and accelerate reading log files and understand problems of software and hardware with the example of printers.
 
 Therefore, I set as a goal that the chatbot should be able to answer questions like: "Please tell me whether there was a problem with the printing for a.jones roughly around 8 o clock at the 20th of October and whether it got resolved."
 
