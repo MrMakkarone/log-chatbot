@@ -91,7 +91,6 @@ Output a single JSON object matching the `llm_query_dict` schema defined below. 
 import subprocess
 import json
 from typing import List, Optional
-import ast
 
 
 class Tools:
@@ -101,7 +100,7 @@ class Tools:
         self.file_handler = True
         self.citation = True
 
-    async def _query_relevant_data(self, query: str) -> str:
+    async def query_log_database(self, query: str, __files__: List[dict] = []) -> str:
         """
         :params: query:str: The DSL conform query in a JSON VALID format
         :return: Data is displayed in chat UI. Please inform the user if the data retrieval was successful, and whether the data was displayed successfully.
@@ -112,14 +111,17 @@ class Tools:
                 "Please provide a query",
             )
 
-        # each prompt store files and flush database afterwards. Keep it simple for prototype
-        await self._store_log_files()
+        # each prompt files are stored and database is recreated afterwards. Keep it simple for prototype
+        files = __files__
+        store_result = await self._store_log_files(files)
+        if store_result.startswith(("No log file", "Script error", "0 entries")):
+            return store_result
 
         subprocess_output = subprocess.run(
             [
                 "python",
                 "/app/custom_scripts/query_log_database.py",
-                query,#already valid JSON
+                query,  # already valid JSON
             ],
             capture_output=True,
             text=True,
@@ -129,9 +131,12 @@ class Tools:
         await self._clear_database()
 
         if subprocess_output.returncode != 0:
-            return None, f"Script error:\n{subprocess_output.stderr}"
+            return f"Script error:\n{subprocess_output.stderr.strip()}"
 
-        retrieved_data = ast.literal_eval(subprocess_output.stdout)
+        try:
+            retrieved_data = json.loads(subprocess_output.stdout)
+        except json.JSONDecodeError:
+            return f"Script returned invalid JSON:\n{subprocess_output.stdout.strip()}"
 
         if not retrieved_data:
             raise ValueError("No data found for the specified parameters.")
@@ -146,7 +151,9 @@ class Tools:
         tokens_est = len(str(retrieved_data)) // 4
         if tokens_est > 20000:
             result += f"The number of tokens is {tokens_est} tokens and thereby exceeds the limit of around 18-20k tokens. The answer was truncated to contain roughly 18k tokens."
-            result += str(retrieved_data)[:72_000]  # ~18k tokens, with some safety margin
+            result += str(retrieved_data)[
+                :72_000
+            ]  # ~18k tokens, with some safety margin
         else:
             result += str(retrieved_data)
 
@@ -154,17 +161,17 @@ class Tools:
 
     async def _store_log_files(
         self,
-        __files__: List[dict] = [],
+        files: List[dict] = [],
     ) -> str:
         """
         __files__ is open webui's internal files parameter - all files in the current chat
         """
 
         # .csv check missing. But fine for prototype.
-        if not __files__:
+        if not files:
             return "No log file uploaded yet. .csv expected - found none. Required to answer any questions about logs."
         file_paths = []
-        for file in __files__:
+        for file in files:
             file_paths.append(file.get("file", {}).get("path"))
         file_paths = json.dumps(file_paths)
         result = subprocess.run(
@@ -186,6 +193,6 @@ class Tools:
         subprocess.run(
             [
                 "python",
-                "/app/custom_scripts/flush_database.py",
+                "/app/custom_scripts/clear_database.py",
             ],
         )
