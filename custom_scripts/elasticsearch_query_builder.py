@@ -20,10 +20,10 @@ possible llm_query_dict - dsl examples
   "query": {
     "bool": {
       "must": [
-        { "wildcard": { "log_type": { "value": "*x*", "case_insensitive": true } } },
-        { "wildcard": { "component": { "value": "*x*", "case_insensitive": true } } },
-        { "wildcard": { "event": { "value": "*x*", "case_insensitive": true } } },
-        { "wildcard": { "message": { "value": "*x*", "case_insensitive": true } } }
+        { "wildcard": { "log_type": "*x*" } },
+        { "wildcard": { "component": "*x*" } },
+        { "wildcard": { "event": "*x*" } },
+        { "wildcard": { "message": "*x*" } }
       ],
       "filter": [
         { "terms": { "severity": ["WARN", "ERROR"] } },
@@ -104,3 +104,11 @@ def _escape_value(input) -> str:
     escaped_value = f"{prefix}{escaped_core}{suffix}"
 
     return escaped_value
+
+
+#test llm_dsl_query
+#import json
+#if __name__ == "__main__":
+#    json_string = """{"timestamp": {"gte": "2026-10-20 07:30:00", "lte": "2026-10-20 08:30:00"}, "severity": ["ERROR", "WARN"], "username": "a.jones"}"""
+#    query_dict = json.loads(json_string)
+#    print(build_query(query_dict))

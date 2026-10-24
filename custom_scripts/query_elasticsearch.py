@@ -1,3 +1,5 @@
+import sys
+
 from elasticsearch import Elasticsearch
 #10k is max retrieval size, different approach if more is needed
 def query_elasticsearch(query, index="log_database", size=10000):
@@ -18,3 +20,10 @@ def query_elasticsearch(query, index="log_database", size=10000):
         result.append(source)
 
     return result
+
+#test database query. Dont forget to change to http://localhost:9200 instead of http://elasticsearch:9200
+#if __name__ == "__main__":
+#    query_dict:dict = {'query': {'bool': {'must': [{'wildcard': {'username': 'a.jones'}}], 'filter': [{'range': {'timestamp': {'gte': '2026-10-20 01:30:00', 'lte': '2026-10-20 11:30:00'}}}, {'terms': {'severity': ['ERROR', 'WARN']}}]}}}
+#
+#    result = query_elasticsearch(query = query_dict)
+#    print(result)

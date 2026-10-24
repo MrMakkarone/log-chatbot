@@ -62,7 +62,7 @@ Output a single JSON object matching the `llm_query_dict` schema defined below. 
     "lte": "2026-10-23"
   },
   "severity": ["WARN", "ERROR"],
-  "component": "payment-api",
+  "component": "AUDIT",
   "message": "*failed*"
 }
 
@@ -103,7 +103,7 @@ class Tools:
     async def query_log_database(self, query: str, __files__: List[dict] = []) -> str:
         """
         :params: query:str: The DSL conform query in a JSON VALID format
-        :return: Data is displayed in chat UI. Please inform the user if the data retrieval was successful, and whether the data was displayed successfully.
+        :return: Query results.
         """
 
         if query == None:
