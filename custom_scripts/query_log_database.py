@@ -13,16 +13,20 @@ def parse_json_arg(raw):
         return raw
 
 def main():
-    llm_query_json = parse_json_arg(sys.argv[1]) if len(sys.argv) > 1 else None
-    try:
-        llm_query_dict:dict = json.loads(llm_query_json)
-    except json.JSONDecodeError:
-        return print("Invalid JSON format")
+    llm_query_dict = parse_json_arg(sys.argv[1]) if len(sys.argv) > 1 else None
+    if llm_query_dict is None:
+        llm_query_dict = {}
+    if not isinstance(llm_query_dict, dict):
+        raise ValueError("The query must be a JSON object")
     built_query = build_query(llm_query_dict)
     result = query_elasticsearch(built_query)
     return result
 
 
 if __name__ == "__main__":
-    result = main()
-    print(result)  # !this is important since the tool will read the print!
+    try:
+        result = main()
+        print(json.dumps(result, ensure_ascii=False))
+    except Exception as exc:
+        print(f"{type(exc).__name__}: {exc}", file=sys.stderr)
+        sys.exit(1)
