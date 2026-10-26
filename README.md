@@ -43,6 +43,6 @@ docker compose up -d
 
 Admin Panel -> Settings -> Connections -> set URL to https://openrouter.ai/api/v1 and use the user token for the Bearer authentication.
 
-Other API chat completions work more or less the same. I used [groq](https://groq.com/)'s (https://api.groq.com/openai/v1)(not GROK!:)) and [mistral](https://mistral.ai/)'s (https://api.mistral.ai/v1) API as well. Sometimes they change free models and rate limits, so simply choose what works best for you.
+Other API chat completions work more or less the same. I used [groq](https://groq.com/)'s (https://api.groq.com/openai/v1) (not GROK!:)) and [mistral](https://mistral.ai/)'s (https://api.mistral.ai/v1) API as well. Sometimes they change free models and rate limits, so simply choose what works best for you.
 
 The user token: Found under profile-icon (right top) -> Settings -> Accounts -> API keys -> JWT token (might need to be activated if not yet visible: admin panel -> Settings -> General -> Enable API keys)
